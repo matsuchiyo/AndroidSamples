@@ -93,7 +93,7 @@ class MainActivity : AppCompatActivity() {
     }
 }
 
-class MyAdapter(val context: Context, val items: List<Int>): RecyclerView.Adapter<MyViewHolder>() {
+class MyAdapter(val context: Context, var items: List<Int>): RecyclerView.Adapter<MyViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MyViewHolder {
         return MyViewHolder(LayoutInflater.from(context).inflate(R.layout.my_item, parent, false))
