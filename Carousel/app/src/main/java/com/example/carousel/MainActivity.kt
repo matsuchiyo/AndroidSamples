@@ -60,7 +60,6 @@ class MainActivity : AppCompatActivity() {
         carouselViewPager.registerOnPageChangeCallback(object: ViewPager2.OnPageChangeCallback() {
             override fun onPageScrollStateChanged(state: Int) {
                 super.onPageScrollStateChanged(state)
-                Log.i("aaa", "*** onPageScrollStateChanged state: $state")
                 if (state == ViewPager2.SCROLL_STATE_IDLE) {
                     val realIndex = (carouselViewPager.currentItem - 1 + items.size) % items.size
                     val newFakeIndex = realIndex + 1
@@ -77,7 +76,6 @@ class MainActivity : AppCompatActivity() {
         timer = Timer()
         timer?.schedule(object: TimerTask() {
             override fun run() {
-                print("*** run")
                 val itemCount = myAdapter?.itemCount ?: return
                 if (itemCount > 1) {
                     val nextIndex = (carouselViewPager.currentItem + 1) % itemCount
