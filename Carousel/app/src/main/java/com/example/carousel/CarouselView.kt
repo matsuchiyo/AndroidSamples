@@ -9,14 +9,20 @@ import android.view.View
 import android.view.ViewOutlineProvider
 import android.widget.FrameLayout
 import androidx.viewpager2.widget.ViewPager2
+import java.util.*
 
 
 class CarouselView(context: Context, attrs: AttributeSet): FrameLayout(context, attrs) {
 
+    companion object {
+        const val AUTO_SCROLL_DURATION_MILLIS: Long = 3000
+        const val CORNER_RADIUS_DP: Float = 40f
+    }
+
     private val clipOutlineProvider = @SuppressLint("NewApi") object : ViewOutlineProvider() {
         @SuppressLint("NewApi")
         override fun getOutline(view: View, outline: Outline) {
-            outline.setRoundRect(0, 0, view.width, view.height, 40f)
+            outline.setRoundRect(0, 0, view.width, view.height, CORNER_RADIUS_DP * context.resources.displayMetrics.density)
         }
     }
 
@@ -30,8 +36,29 @@ class CarouselView(context: Context, attrs: AttributeSet): FrameLayout(context, 
         field = value
     }
 
+    private var timer: Timer? = null
+
     init {
         initializeViews()
+        configureViewPager(images)
+    }
+
+    override fun onVisibilityChanged(changedView: View, visibility: Int) {
+        super.onVisibilityChanged(changedView, visibility)
+        when (visibility) {
+            View.VISIBLE -> {
+                clearTimer()
+                timer = Timer()
+                timer?.schedule(object: TimerTask() {
+                    override fun run() {
+                        scrollToNextPage()
+                    }
+                }, 0, AUTO_SCROLL_DURATION_MILLIS)
+            }
+            View.INVISIBLE, View.GONE -> {
+                clearTimer()
+            }
+        }
     }
 
     @SuppressLint("NewApi")
@@ -47,7 +74,6 @@ class CarouselView(context: Context, attrs: AttributeSet): FrameLayout(context, 
 
     private fun configureViewPager(images: List<Int>) {
         Log.i("BBB", "*** configureViewPager")
-//        val items = listOf(R.drawable.baseline_add_24, R.drawable.baseline_clear_24, R.drawable.baseline_keyboard_arrow_left_24)
         adapter = MyAdapter(context, images)
         viewPager.adapter = adapter
         if (images.size > 1) {
@@ -57,12 +83,25 @@ class CarouselView(context: Context, attrs: AttributeSet): FrameLayout(context, 
         viewPager.registerOnPageChangeCallback(object: ViewPager2.OnPageChangeCallback() {
             override fun onPageScrollStateChanged(state: Int) {
                 super.onPageScrollStateChanged(state)
-                if (state == ViewPager2.SCROLL_STATE_IDLE) {
+                if (state == ViewPager2.SCROLL_STATE_IDLE && images.size > 1) {
                     val realIndex = (viewPager.currentItem - 1 + images.size) % images.size
                     val newFakeIndex = realIndex + 1
                     viewPager.setCurrentItem(newFakeIndex, false)
                 }
             }
         })
+    }
+
+    private fun scrollToNextPage() {
+        val itemCount = adapter?.itemCount ?: return
+        if (itemCount > 1) {
+            val nextIndex = (viewPager.currentItem + 1) % itemCount
+            viewPager.setCurrentItem(nextIndex, true)
+        }
+    }
+
+    private fun clearTimer() {
+        timer?.cancel()
+        timer = null
     }
 }
