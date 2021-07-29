@@ -35,6 +35,7 @@ class MyItemDecoration(
         val count = parent.adapter?.itemCount ?: 0
 //        Log.i("AAA", "*** parent.width ${parent.width}")
 
+        /*
         outRect.left = (density * 4).toInt()
         outRect.right = (density * 4).toInt()
 
@@ -44,6 +45,14 @@ class MyItemDecoration(
 
         if (position == count - 1) {
             outRect.right = (density * 16).toInt()
+        }
+         */
+        if (position == 0) {
+            outRect.left = (density * 12).toInt()
+        }
+
+        if (position == count - 1) {
+            outRect.right = (density * 12).toInt()
         }
     }
 }

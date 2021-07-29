@@ -37,9 +37,13 @@ class MainActivity : AppCompatActivity() {
             val itemWidth = recyclerViewHeight * (343 / 216f)
             val itemLeftSpaceWidth = 4 * resources.displayMetrics.density
             val offset = (recyclerViewWidth - itemWidth) / 2f - itemLeftSpaceWidth
-            (recyclerView.layoutManager as LinearLayoutManager).scrollToPositionWithOffset(3, offset.toInt())
+
+            val realFirstPosition = 0
+            val firstPosition = realFirstPosition + adapter.getRealItemCount() * (ItemAdapter.LOOP_COUNT_FOR_INFINITE_SCROLL * 0.5).toInt()
+            (recyclerView.layoutManager as LinearLayoutManager).scrollToPositionWithOffset(firstPosition, offset.toInt())
         })
 
         recyclerView.addOnScrollListener(CardScrollController(this))
+        recyclerView.addOnScrollListener(InfiniteScrollController(this))
     }
 }

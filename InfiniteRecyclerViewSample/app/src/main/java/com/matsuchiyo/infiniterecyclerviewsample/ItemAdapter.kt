@@ -8,6 +8,10 @@ import androidx.recyclerview.widget.RecyclerView
 
 class ItemAdapter: RecyclerView.Adapter<ItemViewHolder>() {
 
+    companion object {
+        const val LOOP_COUNT_FOR_INFINITE_SCROLL = 100
+    }
+
     var items: List<Item> = listOf()
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ItemViewHolder {
@@ -15,10 +19,15 @@ class ItemAdapter: RecyclerView.Adapter<ItemViewHolder>() {
     }
 
     override fun onBindViewHolder(holder: ItemViewHolder, position: Int) {
-        holder.textView.text = items[position].name
+        val realPosition = position % items.count()
+        holder.textView.text = items[realPosition].name
     }
 
     override fun getItemCount(): Int {
+        return items.count() * LOOP_COUNT_FOR_INFINITE_SCROLL
+    }
+
+    fun getRealItemCount(): Int {
         return items.count()
     }
 }
