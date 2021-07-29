@@ -30,7 +30,13 @@ class MainActivity : AppCompatActivity() {
             Log.d("AAA", "*** viewMOdel.items.observe")
             adapter.items = it
             adapter.notifyDataSetChanged()
-            val offset = 8 * resources.displayMetrics.density
+
+            // いまいちだけど、このタイミングだと、recyclerViewのサイズが取得できないため。
+            val recyclerViewWidth = windowManager.currentWindowMetrics.bounds.width()
+            val recyclerViewHeight = recyclerViewWidth * (216 / 375f)
+            val itemWidth = recyclerViewHeight * (343 / 216f)
+            val itemLeftSpaceWidth = 4 * resources.displayMetrics.density
+            val offset = (recyclerViewWidth - itemWidth) / 2f - itemLeftSpaceWidth
             (recyclerView.layoutManager as LinearLayoutManager).scrollToPositionWithOffset(3, offset.toInt())
         })
 
