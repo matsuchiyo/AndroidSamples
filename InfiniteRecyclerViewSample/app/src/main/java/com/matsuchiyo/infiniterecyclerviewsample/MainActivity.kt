@@ -40,39 +40,6 @@ class MainActivity : AppCompatActivity() {
             (recyclerView.layoutManager as LinearLayoutManager).scrollToPositionWithOffset(3, offset.toInt())
         })
 
-        var state = 0
-
-        var isScrolling = false
-
-        recyclerView.addOnScrollListener(object: RecyclerView.OnScrollListener() {
-            override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
-                super.onScrollStateChanged(recyclerView, newState)
-                Log.d("AAA", "*** newState: $newState")
-                state = newState
-
-                if (newState == RecyclerView.SCROLL_STATE_IDLE) {
-                    isScrolling = false
-                }
-            }
-
-            override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
-                Log.d("AAA", "*** dx: $dx")
-
-                if (!isScrolling && state == RecyclerView.SCROLL_STATE_SETTLING && (dx > -5 && dx < 5)) {
-                    Log.d("AAA", "*** recyclerView.height: ${recyclerView.height}, ${recyclerView.scrollX}")
-
-                    val offsetX = recyclerView.computeHorizontalScrollOffset()
-                    val cardWidth = recyclerView.height * (343f / 216f)
-                    val space = 8 * resources.displayMetrics.density
-                    val startMargin = space
-
-                    val newPosition = ((offsetX - startMargin) / (space + cardWidth)).roundToInt()
-
-                    recyclerView.smoothScrollToPosition(newPosition)
-
-                    isScrolling = true
-                }
-            }
-        })
+        recyclerView.addOnScrollListener(CardScrollController(this))
     }
 }
