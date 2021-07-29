@@ -17,11 +17,12 @@ class MyItemDecoration(
     private var startMarginInPx: Int = 0
     private var endMarginInPx: Int = 0
 
+    private val density = context.resources.displayMetrics.density
+
     init {
-        val displayMetrics = context.resources.displayMetrics
-        spaceInPx = (spaceInDp * displayMetrics.density).toInt()
-        startMarginInPx = (startMarginInDp * displayMetrics.density).toInt()
-        endMarginInPx = (endMarginInDp * displayMetrics.density).toInt()
+        spaceInPx = (spaceInDp * density).toInt()
+        startMarginInPx = (startMarginInDp * density).toInt()
+        endMarginInPx = (endMarginInDp * density).toInt()
     }
 
     override fun getItemOffsets(
@@ -34,15 +35,15 @@ class MyItemDecoration(
         val count = parent.adapter?.itemCount ?: 0
 //        Log.i("AAA", "*** parent.width ${parent.width}")
 
+        outRect.left = (density * 4).toInt()
+        outRect.right = (density * 4).toInt()
+
         if (position == 0) {
-            outRect.left = startMarginInPx
+            outRect.left = (density * 16).toInt()
+        }
 
-        } else {
-            outRect.left = spaceInPx
-
-            if (position == count - 1) {
-                outRect.right = endMarginInPx
-            }
+        if (position == count - 1) {
+            outRect.right = (density * 16).toInt()
         }
     }
 }

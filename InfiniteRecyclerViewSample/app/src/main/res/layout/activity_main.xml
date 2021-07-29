@@ -27,6 +27,7 @@
         app:layout_constraintDimensionRatio="343:216"
     -->
     <androidx.recyclerview.widget.RecyclerView
+        android:background="#00ff00"
         android:id="@+id/recycler_view"
         android:layout_width="0dp"
         android:layout_height="0dp"

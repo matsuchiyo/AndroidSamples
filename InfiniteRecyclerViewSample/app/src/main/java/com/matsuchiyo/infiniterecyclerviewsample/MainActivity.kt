@@ -18,7 +18,7 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
 
         val recyclerView = findViewById<RecyclerView>(R.id.recycler_view)
-        recyclerView.layoutManager = LinearLayoutManager(this).also {
+        recyclerView.layoutManager = MyLinearLayoutManager(this).also {
             it.orientation = LinearLayoutManager.HORIZONTAL
         }
         recyclerView.addItemDecoration(MyItemDecoration(this, 8, 16, 16))
@@ -27,36 +27,44 @@ class MainActivity : AppCompatActivity() {
         recyclerView.adapter = adapter
 
         viewModel.items.observe(this, Observer {
-            Log.i("AAA", "*** viewMOdel.items.observe")
+            Log.d("AAA", "*** viewMOdel.items.observe")
             adapter.items = it
             adapter.notifyDataSetChanged()
-//            recyclerView.scrollToPosition(3)
-//            recyclerView.scrollX -= (8 * resources.displayMetrics.density).toInt()
-//            recyclerView.scrollTo(recyclerView.scrollX - (8 * resources.displayMetrics.density).toInt(), recyclerView.scrollY)
-//            recyclerView.scrollTo(-100, 100)
             val offset = 8 * resources.displayMetrics.density
             (recyclerView.layoutManager as LinearLayoutManager).scrollToPositionWithOffset(3, offset.toInt())
         })
 
         var state = 0
 
+        var isScrolling = false
+
         recyclerView.addOnScrollListener(object: RecyclerView.OnScrollListener() {
             override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
                 super.onScrollStateChanged(recyclerView, newState)
-                Log.i("AAA", "*** newState: $newState")
+                Log.d("AAA", "*** newState: $newState")
                 state = newState
+
+                if (newState == RecyclerView.SCROLL_STATE_IDLE) {
+                    isScrolling = false
+                }
             }
 
             override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
-//                super.onScrolled(recyclerView, dx, dy)
-                Log.i("AAA", "*** dx: $dx")
+                Log.d("AAA", "*** dx: $dx")
 
-                if (state == RecyclerView.SCROLL_STATE_SETTLING && dx < 5) {
-                        Log.i("AAA", "*** recyclerView.height: ${recyclerView.height}, ${recyclerView.scrollX}")
-                    val newPosition = ((recyclerView.scrollX - 8f) / (8 * resources.displayMetrics.density + recyclerView.height * 343f / 216f)).roundToInt()
+                if (!isScrolling && state == RecyclerView.SCROLL_STATE_SETTLING && (dx > -5 && dx < 5)) {
+                    Log.d("AAA", "*** recyclerView.height: ${recyclerView.height}, ${recyclerView.scrollX}")
 
-                    val offset = 8 * resources.displayMetrics.density
-                    (recyclerView.layoutManager as LinearLayoutManager).scrollToPositionWithOffset(newPosition, offset.toInt())
+                    val offsetX = recyclerView.computeHorizontalScrollOffset()
+                    val cardWidth = recyclerView.height * (343f / 216f)
+                    val space = 8 * resources.displayMetrics.density
+                    val startMargin = space
+
+                    val newPosition = ((offsetX - startMargin) / (space + cardWidth)).roundToInt()
+
+                    recyclerView.smoothScrollToPosition(newPosition)
+
+                    isScrolling = true
                 }
             }
         })
