@@ -1,8 +1,14 @@
 package com.matsuchiyo.infiniterecyclerviewsample
 
+import android.app.ActivityOptions
+import android.content.Intent
+import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.transition.ChangeBounds
+import android.transition.Fade
 import android.util.Log
+import android.view.Window
 import androidx.activity.viewModels
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -15,6 +21,9 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        configureAnimatedTransition()
+
         setContentView(R.layout.activity_main)
 
         val recyclerView = findViewById<RecyclerView>(R.id.recycler_view)
@@ -45,5 +54,27 @@ class MainActivity : AppCompatActivity() {
 
         recyclerView.addOnScrollListener(CardScrollController(this))
         recyclerView.addOnScrollListener(InfiniteScrollController(this))
+
+        // https://developer.android.com/training/transitions/start-activity?hl=ja
+        adapter.setOnItemClickListener { item, view ->
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                val intent = Intent(this, DetailActivity::class.java).also {
+                    it.putExtra(DetailActivity.ITEM, item)
+                }
+                val options = ActivityOptions.makeSceneTransitionAnimation(this, view, "card")
+                startActivity(intent, options.toBundle())
+            }
+        }
+    }
+
+    private fun configureAnimatedTransition() {
+        // https://developer.android.com/training/transitions/start-activity?hl=ja
+        with(window) {
+            requestFeature(Window.FEATURE_CONTENT_TRANSITIONS)
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                exitTransition = Fade()
+                sharedElementExitTransition = ChangeBounds()
+            }
+        }
     }
 }

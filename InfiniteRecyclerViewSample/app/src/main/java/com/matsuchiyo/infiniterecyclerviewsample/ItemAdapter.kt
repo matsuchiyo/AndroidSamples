@@ -12,6 +12,8 @@ class ItemAdapter: RecyclerView.Adapter<ItemViewHolder>() {
         const val LOOP_COUNT_FOR_INFINITE_SCROLL = 100
     }
 
+    private var onItemClickListener: ((Item, View) -> Unit)? = null
+
     var items: List<Item> = listOf()
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ItemViewHolder {
@@ -20,7 +22,11 @@ class ItemAdapter: RecyclerView.Adapter<ItemViewHolder>() {
 
     override fun onBindViewHolder(holder: ItemViewHolder, position: Int) {
         val realPosition = position % items.count()
-        holder.textView.text = items[realPosition].name
+        val item = items[realPosition]
+        holder.textView.text = item.name
+        holder.itemView.setOnClickListener {
+            onItemClickListener?.invoke(item, it)
+        }
     }
 
     override fun getItemCount(): Int {
@@ -30,8 +36,12 @@ class ItemAdapter: RecyclerView.Adapter<ItemViewHolder>() {
     fun getRealItemCount(): Int {
         return items.count()
     }
+
+    fun setOnItemClickListener(onItemClickListener: (Item, View) -> Unit) {
+        this.onItemClickListener = onItemClickListener
+    }
 }
 
-class ItemViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+class ItemViewHolder(itemView: View): RecyclerView.ViewHolder(itemView) {
     val textView: TextView = itemView.findViewById(R.id.name_text)
 }
