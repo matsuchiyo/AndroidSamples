@@ -90,4 +90,19 @@ class CustomTabTwitterSignInActivity: AppCompatActivity() {
             }
         }
     }
+
+    private fun invalidateAccessToken() {
+        lifecycleScope.launch {
+            withContext(Dispatchers.IO) {
+                /*
+                // ログインしてからしばらく経ってからアプリを起動したときに、呼び出す場合
+                val oAuth = OAuthAuthorization.newBuilder()
+                    .oAuthConsumer(TwitterConstants.API_KEY, TwitterConstants.API_SECRET)
+                    .oAuthAccessToken("access_token", "secret") // TODO: どこかに保存しておいたaccess_tokenとsecret
+                    .build()
+                 */
+                oAuth.invalidateOAuthToken()
+            }
+        }
+    }
 }
