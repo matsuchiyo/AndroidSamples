@@ -38,7 +38,7 @@ class WebViewTwitterSignInActivity: AppCompatActivity() {
                 oAuth = OAuthAuthorization.newBuilder()
                     .oAuthConsumer(TwitterConstants.API_KEY, TwitterConstants.API_SECRET)
                     .build()
-                val requestToken = oAuth.oAuthRequestToken
+                val requestToken = oAuth.getOAuthRequestToken(TwitterConstants.CALLBACK_URL)
                 withContext(Dispatchers.Main) {
                     getTwitterOAuthVerifier.launch(Intent(this@WebViewTwitterSignInActivity, WebViewActivity::class.java).also {
                         it.putExtra(WebViewActivity.AUTHORIZATION_URL, requestToken.authorizationURL)

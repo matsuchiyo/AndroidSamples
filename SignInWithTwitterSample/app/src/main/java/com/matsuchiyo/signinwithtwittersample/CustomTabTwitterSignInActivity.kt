@@ -68,7 +68,7 @@ class CustomTabTwitterSignInActivity: AppCompatActivity() {
                 oAuth = OAuthAuthorization.newBuilder()
                     .oAuthConsumer(TwitterConstants.API_KEY, TwitterConstants.API_SECRET)
                     .build()
-                val requestToken = oAuth.oAuthRequestToken
+                val requestToken = oAuth.getOAuthRequestToken(TwitterConstants.CALLBACK_URL)
                 withContext(Dispatchers.Main) {
                     val customTabsIntent = CustomTabsIntent.Builder().build()
                     customTabsIntent.launchUrl(this@CustomTabTwitterSignInActivity, Uri.parse(requestToken.authorizationURL))
