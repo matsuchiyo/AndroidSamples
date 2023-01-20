@@ -10,6 +10,7 @@ import androidx.lifecycle.lifecycleScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import org.json.JSONObject
 import twitter4j.OAuthAuthorization
 
 class WebViewTwitterSignInActivity: AppCompatActivity() {
@@ -34,10 +35,17 @@ class WebViewTwitterSignInActivity: AppCompatActivity() {
     private fun signInWithTwitter() {
         lifecycleScope.launch {
             withContext(Dispatchers.IO) {
-                // https://twitter4j.org/code-examples の「OAuth support」
+                val twitterConsumerKeyJsonText: String = resources.openRawResource(R.raw.twitter_consumer_key).bufferedReader().use { it.readText() }
+                val twitterConsumerKey = JSONObject(twitterConsumerKeyJsonText)
+
+                // https://twitter4j.org/code-examples "OAuth support"
                 oAuth = OAuthAuthorization.newBuilder()
-                    .oAuthConsumer(TwitterConstants.API_KEY, TwitterConstants.API_SECRET)
+                    .oAuthConsumer(
+                        twitterConsumerKey.getString("consumerKey"),
+                        twitterConsumerKey.getString("consumerSecret"),
+                    )
                     .build()
+
                 val requestToken = oAuth.getOAuthRequestToken(TwitterConstants.CALLBACK_URL)
                 withContext(Dispatchers.Main) {
                     getTwitterOAuthVerifier.launch(Intent(this@WebViewTwitterSignInActivity, WebViewActivity::class.java).also {
