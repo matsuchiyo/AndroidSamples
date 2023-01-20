@@ -54,7 +54,8 @@ class WebViewTwitterSignInActivity: AppCompatActivity() {
                 val accessToken = oAuth.getOAuthAccessToken(verifier)
                 withContext(Dispatchers.Main) {
                     val textView = findViewById<TextView>(R.id.access_token_text)
-                    textView.text = "Access Token: [${accessToken.token}]"
+//                    textView.text = "Access Token: [${accessToken.token}]"
+                    textView.text = "Access Token: [${accessToken.token.replace(Regex("[0-9a-zA-Z]{1}"), "*")}]" // mask access token
                 }
             }
         }

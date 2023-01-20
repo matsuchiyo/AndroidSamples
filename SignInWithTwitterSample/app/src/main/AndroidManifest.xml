@@ -40,7 +40,7 @@
                 <action android:name="android.intent.action.VIEW" />
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
-                <data android:scheme="https" android:host="tag-pad-debug.web.app" android:path="/auth-callback"/>
+                <data android:scheme="https" android:host="tag-pad-debug.web.app" android:path="/oauth-callback/twitter"/>
             </intent-filter>
         </activity>
 

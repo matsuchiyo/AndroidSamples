@@ -12,32 +12,17 @@ import androidx.lifecycle.lifecycleScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import org.json.JSONObject
 import twitter4j.OAuthAuthorization
 
 class CustomTabTwitterSignInActivity: AppCompatActivity() {
-
-    companion object {
-        const val O_AUTH_AUTHORIZATION = "O_AUTH_AUTHORIZATION"
-    }
 
     lateinit var oAuth: OAuthAuthorization
 
     override fun onCreate(savedInstanceState: Bundle?) {
         Log.d("CustomTabSignIn", "***** onCreate")
         super.onCreate(savedInstanceState)
-
-        /*
-        Log.d("CustomTabSignIn", "***** restore state start")
-        (savedInstanceState?.getSerializable(O_AUTH_AUTHORIZATION) as OAuthAuthorization?)?.let {
-            Log.d("CustomTabSignIn", "***** state exists")
-            oAuth = it
-        }
-        Log.d("CustomTabSignIn", "***** restore state end")
-         */
-
         setContentView(R.layout.activity_custom_tab_twitter_sign_in)
-
-        getAccessTokenIfNeeded(intent.data)
 
         findViewById<Button>(R.id.sign_in_with_twitter_by_custom_tab).setOnClickListener {
             signInWithTwitter()
@@ -50,23 +35,21 @@ class CustomTabTwitterSignInActivity: AppCompatActivity() {
         getAccessTokenIfNeeded(intent?.data)
     }
 
-    override fun onSaveInstanceState(outState: Bundle) {
-        Log.d("CustomTabSignIn", "***** onSaveInstanceState()")
-//        outState.putSerializable(O_AUTH_AUTHORIZATION, oAuth)
-        super.onSaveInstanceState(outState)
-    }
-
     private fun signInWithTwitter() {
         lifecycleScope.launch {
             withContext(Dispatchers.IO) {
                 // https://developer.twitter.com/en/docs/authentication/oauth-1-0a/obtaining-user-access-tokens
                 // https://developer.twitter.com/en/docs/authentication/api-reference/request_token
-                //   ↑の/oauth/request_tokenを呼ぶ時のHTTP Request Headerの作成が大変。
-                //   なので、WebViewのやり方と同様に、Twitter4Jでrequest_tokenを取得。
 
-                // https://twitter4j.org/code-examples の「OAuth support」
+                val twitterConsumerKeyJsonText: String = resources.openRawResource(R.raw.twitter_consumer_key).bufferedReader().use { it.readText() }
+                val twitterConsumerKey = JSONObject(twitterConsumerKeyJsonText)
+
+                // https://twitter4j.org/code-examples "OAuth support"
                 oAuth = OAuthAuthorization.newBuilder()
-                    .oAuthConsumer(TwitterConstants.API_KEY, TwitterConstants.API_SECRET)
+                    .oAuthConsumer(
+                        twitterConsumerKey.getString("consumerKey"),
+                        twitterConsumerKey.getString("consumerSecret"),
+                    )
                     .build()
                 val requestToken = oAuth.getOAuthRequestToken(TwitterConstants.CALLBACK_URL)
                 withContext(Dispatchers.Main) {
@@ -85,7 +68,7 @@ class CustomTabTwitterSignInActivity: AppCompatActivity() {
                 val accessToken = oAuth.getOAuthAccessToken(verifier)
                 withContext(Dispatchers.Main) {
                     val textView = findViewById<TextView>(R.id.access_token_text)
-                    textView.text = "Access Token [${accessToken.token}]"
+                    textView.text = "Access Token [${accessToken.token.replace(Regex("[0-9a-zA-Z]{1}"), "*")}]"
                 }
             }
         }
@@ -98,7 +81,7 @@ class CustomTabTwitterSignInActivity: AppCompatActivity() {
                 // ログインしてからしばらく経ってからアプリを起動したときに、呼び出す場合
                 val oAuth = OAuthAuthorization.newBuilder()
                     .oAuthConsumer(TwitterConstants.API_KEY, TwitterConstants.API_SECRET)
-                    .oAuthAccessToken("access_token", "secret") // TODO: どこかに保存しておいたaccess_tokenとsecret
+                    .oAuthAccessToken("access_token", "secret") // TODO: Get access token and secret that is saved in EncryptedSharedPreferences and so on.
                     .build()
                  */
                 oAuth.invalidateOAuthToken()
